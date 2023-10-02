@@ -1,0 +1,3 @@
+[submodule "Stack_task"]
+	path = Stack_task
+	url = https://github.com/dmitry131131/Stack_task.git
