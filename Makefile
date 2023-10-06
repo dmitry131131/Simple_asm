@@ -15,12 +15,12 @@ TARGET = main
 SourcePrefix = src/
 BuildPrefix = build/
 BuildFolder = build
-Include = -Iinclude -IStack_task/include
+Include = -Iinclude 
 
 Sources = 
 Main = main.cpp
 
-LibObjects = Stack_task/Color_console_output/build/Color_output.o Stack_task/build/Hash.o Stack_task/build/Output.o Stack_task/build/Stack.o
+LibObjects = 
 
 Source = $(addprefix $(SourcePrefix), $(Sources))
 MainObject = $(patsubst %.cpp, $(BuildPrefix)%.o, $(Main))
