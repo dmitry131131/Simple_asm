@@ -1,14 +1,17 @@
 #include <stdio.h>
 
-#include "Stack.h"
+#include "OneginError.h"
+#include "AsmErrors.h"
+#include "InputOutput.h"
+#include "AsmRead.h"
+#include "AssemblerFunc.h"
 
 int main()
 {
-    Stack stk = {};
-    STACK_CTOR(&stk, 6);
+    textData* text = asm_prepare("text.txt");
 
-    STACK_DUMP(&stk);
+    main_assembler_function(text);
 
-    STACK_DTOR(&stk);
+    remove_text(text);
     return 0;
 }

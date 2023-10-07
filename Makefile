@@ -15,12 +15,13 @@ TARGET = main
 SourcePrefix = src/
 BuildPrefix = build/
 BuildFolder = build
-Include = -Iinclude 
+Include = -Iinclude -IOnegin_task/include
 
-Sources = 
+Sources = AsmRead.cpp AssemblerFunc.cpp AsmOut.cpp
 Main = main.cpp
 
-LibObjects = 
+LibObjects = Onegin_task/build/Error.o Onegin_task/build/InputOutput.o Onegin_task/build/Sorts.o\
+ Onegin_task/Color_console_output/build/Color_output.o
 
 Source = $(addprefix $(SourcePrefix), $(Sources))
 MainObject = $(patsubst %.cpp, $(BuildPrefix)%.o, $(Main))
@@ -32,14 +33,13 @@ objects = $(patsubst $(SourcePrefix)%.cpp, $(BuildPrefix)%.o, $(Source))
 all : prepare folder $(TARGET)
 
 prepare: 
-	cd Stack_task && make
-	cd Stack_task/Color_console_output && make
+	cd Onegin_task && make
+	cd Onegin_task/Color_console_output && make
 
 $(BuildPrefix)%.o : $(SourcePrefix)%.cpp
 	@echo [CXX] -c $< -o $@
 	@$(CXX) $(CXXFLAGS) $(Include) -c $< -o $@
 
-#Useless compilation part for compilling in main
 $(TARGET) : $(objects) $(LibObjects) $(MainObject)
 	@echo [CC] $^ -o $@
 	@$(CXX) $(CXXFLAGS) $(Include) $^ -o $@
@@ -47,7 +47,8 @@ $(TARGET) : $(objects) $(LibObjects) $(MainObject)
 clean :
 	rm $(BuildFolder)/*.o
 	rm $(TARGET)
-	cd Color_console_output && make clean
+	cd Onegin_task && make clean
+	cd Onegin_task/Color_console_output && make clean
 
 folder :
 	mkdir -p $(BuildFolder)
