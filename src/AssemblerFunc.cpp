@@ -72,7 +72,7 @@ enum asmErrorCode main_assembler_function(textData* text)
                 cmd |= 1 << 5;
                 registerNames reg = NO_NAME_REG;
 
-                fprintf(outputTextFile, "33 %lf\n", commandArg);
+                fprintf(outputTextFile, "33 ");
 
                 if (write_char_to_bin_file(outputBinFile, cmd))
                 {
@@ -102,6 +102,8 @@ enum asmErrorCode main_assembler_function(textData* text)
                     }
                 }
 
+                fprintf(outputTextFile, "%d\n", reg);
+
                 if (write_char_to_bin_file(outputBinFile, reg))
                 {
                     // write to bin error
@@ -124,12 +126,12 @@ enum asmErrorCode main_assembler_function(textData* text)
             char cmd = 0;
 
             cmd |= 1 << 0;
-            cmd |= 1 << 1;
+            cmd |= 1 << 2;
             cmd |= 1 << 3;
             cmd |= 1 << 5;
             registerNames reg = NO_NAME_REG;
 
-            fprintf(outputTextFile, "43 %lf\n", commandArg);
+            fprintf(outputTextFile, "45 ");
 
             if (write_char_to_bin_file(outputBinFile, cmd))
             {
@@ -158,6 +160,8 @@ enum asmErrorCode main_assembler_function(textData* text)
                     break;
                 }
             }
+
+            fprintf(outputTextFile, "%d\n", reg);
 
             if (write_char_to_bin_file(outputBinFile, reg))
             {

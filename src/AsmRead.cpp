@@ -11,6 +11,10 @@
 
 textData* asm_prepare(const char* filename)
 {
+    if (!filename)
+    {
+        // noptr
+    }
     static textData text = {};
     errorCode err = NO_ERRORS;
 
@@ -21,6 +25,10 @@ textData* asm_prepare(const char* filename)
 
 textData* text_to_lower(textData* text)
 {
+    if (!text)
+    {
+        // text noptr
+    }
     for (size_t i = 0; i < text->bufferSize; i++)
     {
         if ((text->bufferName[i] >= 65) && (text->bufferName[i] < 92))

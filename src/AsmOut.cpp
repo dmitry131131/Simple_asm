@@ -9,6 +9,10 @@
 
 FILE* create_output_file(const char* filename, fileCreateMode modeCode)
 {
+    if (!filename)
+    {
+        // noptr
+    }
     char mode[10] = {};
     mode[0] = 'w';
     switch (modeCode)
