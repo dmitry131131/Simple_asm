@@ -2,3 +2,5 @@ build
 main
 .vscode
 text.txt
+outbin
+out.txt

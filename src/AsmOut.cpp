@@ -4,16 +4,14 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "AsmErrors.h"
 #include "AsmOut.h"
 
 asmErrorCode buffer_ctor(outputBuffer* buffer)
 {
-    if (!buffer)
-    {
-        // noptr
-    }
+    assert(buffer);
 
     buffer->Buffer  = NULL;
 
@@ -24,10 +22,7 @@ asmErrorCode buffer_ctor(outputBuffer* buffer)
 
 asmErrorCode buffer_dtor(outputBuffer* buffer)
 {
-    if (!buffer)
-    {
-        // noptr
-    }
+    assert(buffer);
 
     free(buffer->Buffer);
 
@@ -40,10 +35,8 @@ asmErrorCode buffer_dtor(outputBuffer* buffer)
 
 FILE* create_output_file(const char* filename, fileCreateMode modeCode)
 {
-    if (!filename)
-    {
-        // noptr
-    }
+    assert(filename);
+
     char mode[10] = {};
     mode[0] = 'w';
     switch (modeCode)
@@ -71,10 +64,7 @@ FILE* create_output_file(const char* filename, fileCreateMode modeCode)
 
 asmErrorCode create_command_buffer(char** buffer, size_t size)
 {
-    if (!buffer)
-    {
-        //nullptr error
-    }
+    assert(buffer);
 
     *buffer = (char*) calloc(size + 1, sizeof(char));
 
@@ -88,14 +78,9 @@ asmErrorCode create_command_buffer(char** buffer, size_t size)
 
 asmErrorCode write_header_info(FILE* outputTextFile, FILE* outputBinFile, int version, size_t commandCount)
 {
-    if (!outputTextFile)
-    {
-        // nullptr error
-    }
-    if (!outputBinFile)
-    {
-        // nullptr error
-    }
+    assert(outputBinFile);
+
+    assert(outputTextFile);
     
     fprintf(outputTextFile, "AD\n");
     fprintf(outputTextFile, "Version %d\n", version);
@@ -114,10 +99,7 @@ asmErrorCode write_header_info(FILE* outputTextFile, FILE* outputBinFile, int ve
 
 asmErrorCode write_char_to_bin_file(FILE* file, char num)
 {
-    if (!file)
-    {
-        // file nullptr error
-    }
+    assert(file);
 
     if (fwrite(&num, sizeof(char), 1, file) != 1)
     {
@@ -129,10 +111,7 @@ asmErrorCode write_char_to_bin_file(FILE* file, char num)
 
 asmErrorCode write_char_to_buffer(outputBuffer* buffer, char num)
 {
-    if (!buffer)
-    {
-        // file nullptr error
-    }
+    assert(buffer);
 
     (buffer->Buffer)[buffer->bufferPointer] = num;
     (buffer->bufferPointer)++;
@@ -142,6 +121,8 @@ asmErrorCode write_char_to_buffer(outputBuffer* buffer, char num)
 
 asmErrorCode write_buffer_to_file(FILE* file, outputBuffer* buffer)
 {
+    assert(file);
+
     if (fwrite(buffer->Buffer, sizeof(char), buffer->bufferPointer, file) != buffer->bufferPointer)
     {
         // fwrite error
@@ -152,10 +133,7 @@ asmErrorCode write_buffer_to_file(FILE* file, outputBuffer* buffer)
 
 asmErrorCode write_double_to_buffer(outputBuffer* buffer, double num)
 {
-    if (!buffer)
-    {
-        // nullptr
-    }
+    assert(buffer);
 
     char* doublePtr = (char*) &num;
 
@@ -171,10 +149,7 @@ asmErrorCode write_double_to_buffer(outputBuffer* buffer, double num)
 
 asmErrorCode write_double_to_bin_file(FILE* file, double num)
 {
-    if (!file)
-    {
-        // file nullptr error
-    }
+    assert(file);
 
     if (fwrite(&num, sizeof(double), 1, file) != 1)
     {
@@ -186,10 +161,7 @@ asmErrorCode write_double_to_bin_file(FILE* file, double num)
 
 asmErrorCode write_int_to_bin_file(FILE* file, int num)
 {
-    if (!file)
-    {
-        // file nullptr error
-    }
+    assert(file);
 
     if (fwrite(&num, sizeof(int), 1, file) != 1)
     {

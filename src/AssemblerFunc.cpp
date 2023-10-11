@@ -4,6 +4,7 @@
 */
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include "OneginError.h"
 #include "InputOutput.h"
@@ -13,10 +14,7 @@
 
 enum asmErrorCode main_assembler_function(textData* text)
 {
-    if (!text)
-    {
-        // text null
-    }
+    assert(text);
 
     outputBuffer binBuffer  = {};
 
