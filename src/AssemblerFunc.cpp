@@ -18,13 +18,23 @@ enum asmErrorCode main_assembler_function(textData* text)
         // text null
     }
 
-    #define WRITE_SINGLE_COMMAND(num) do{               \
-    fprintf(outputTextFile, #num "\n");                 \
-                                                        \
-    if (write_char_to_bin_file(outputBinFile, num))     \
-    {                                                   \
-                                                        \
-    }                                                   \
+    outputBuffer binBuffer  = {};
+
+    if (buffer_ctor(&binBuffer))
+    {
+        // ctor error
+    }
+
+    if (create_command_buffer(&(binBuffer.Buffer), text->bufferSize * 4))
+    {
+        // error
+    }
+
+    #define WRITE_SINGLE_COMMAND(num) do{                   \
+                                                            \
+    fprintf(outputTextFile, #num "\n");                     \
+    write_char_to_buffer(&binBuffer, num);                  \
+                                                            \
     }while(0)
 
     FILE* outputBinFile = create_output_file("outbin", BIN);
@@ -55,17 +65,10 @@ enum asmErrorCode main_assembler_function(textData* text)
 
                 fprintf(outputTextFile, "17 %lf\n", commandArg);
 
-                if (write_char_to_bin_file(outputBinFile, cmd))
-                {
-                    // write to bin error
-                }
-
-                if (write_double_to_bin_file(outputBinFile, commandArg))
-                {
-                    // write to bin error
-                }
-
+                write_char_to_buffer(&binBuffer, cmd);
+                write_double_to_buffer(&binBuffer, commandArg);
             }
+
             else if (sscanf(text->linesPtr[i], "%s %s", command, registerName) == 2)
             {
                 cmd |= 1 << 0;
@@ -74,10 +77,7 @@ enum asmErrorCode main_assembler_function(textData* text)
 
                 fprintf(outputTextFile, "33 ");
 
-                if (write_char_to_bin_file(outputBinFile, cmd))
-                {
-                    // write to bin error
-                }
+                write_char_to_buffer(&binBuffer, cmd);
 
                 if (registerName[0] == 'r' && registerName[2] == 'x')
                 {
@@ -104,10 +104,7 @@ enum asmErrorCode main_assembler_function(textData* text)
 
                 fprintf(outputTextFile, "%d\n", reg);
 
-                if (write_char_to_bin_file(outputBinFile, reg))
-                {
-                    // write to bin error
-                }
+                write_char_to_buffer(&binBuffer, reg);
             }
 
             else
@@ -133,10 +130,7 @@ enum asmErrorCode main_assembler_function(textData* text)
 
             fprintf(outputTextFile, "45 ");
 
-            if (write_char_to_bin_file(outputBinFile, cmd))
-            {
-                // write to bin error
-            }
+            write_char_to_buffer(&binBuffer, cmd);
 
             if (registerName[0] == 'r' && registerName[2] == 'x')
             {
@@ -163,10 +157,7 @@ enum asmErrorCode main_assembler_function(textData* text)
 
             fprintf(outputTextFile, "%d\n", reg);
 
-            if (write_char_to_bin_file(outputBinFile, reg))
-            {
-                // write to bin error
-            }
+            write_char_to_buffer(&binBuffer, reg);
         }
 
         else if (!strcmp(command, "add"))
@@ -219,13 +210,19 @@ enum asmErrorCode main_assembler_function(textData* text)
             WRITE_SINGLE_COMMAND(11);
         }
         
-        else if (!strcmp(command, "htl"))
+        else if (!strcmp(command, "hlt"))
         {
             WRITE_SINGLE_COMMAND(12);
         }
         
     }
 
+    if (write_buffer_to_file(outputBinFile, &binBuffer))
+    {
+        // write error
+    }
+
+    buffer_dtor(&binBuffer);
     fclose(outputTextFile);
     fclose(outputBinFile);
 
