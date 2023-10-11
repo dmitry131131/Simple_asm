@@ -21,7 +21,7 @@ asmErrorCode write_buffer_to_file(FILE* file, outputBuffer* buffer);
 
 asmErrorCode buffer_dtor(outputBuffer* buffer);
 
-FILE* create_output_file(const char* filename, fileCreateMode modeCode);
+asmErrorCode create_output_file(FILE** file, const char* filename, fileCreateMode modeCode);
 
 asmErrorCode write_header_info(FILE* outputTextFile, FILE* outputBinFile, int version, size_t commandCount);
 

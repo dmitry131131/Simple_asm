@@ -17,15 +17,16 @@ enum asmErrorCode main_assembler_function(textData* text)
     assert(text);
 
     outputBuffer binBuffer  = {};
+    asmErrorCode error = NO_ASSEMBLER_ERRORS;
 
     if (buffer_ctor(&binBuffer))
     {
-        // ctor error
+        return BUFFER_CTOR_ERROR;
     }
 
-    if (create_command_buffer(&(binBuffer.Buffer), text->bufferSize * 4))
+    if ((error = create_command_buffer(&(binBuffer.Buffer), text->bufferSize * 4)))
     {
-        // error
+        return error;
     }
 
     #define WRITE_SINGLE_COMMAND(num) do{                   \
@@ -35,8 +36,17 @@ enum asmErrorCode main_assembler_function(textData* text)
                                                             \
     }while(0)
 
-    FILE* outputBinFile = create_output_file("outbin", BIN);
-    FILE* outputTextFile = create_output_file("out.txt", TEXT);
+    FILE* outputBinFile = NULL;
+    if ((error = create_output_file(&outputBinFile, "outbin", BIN)))
+    {
+        return error;
+    }
+
+    FILE* outputTextFile = NULL;
+    if ((error = create_output_file(&outputTextFile, "out.txt", TEXT)))
+    {
+        return error;
+    }
 
     write_header_info(outputTextFile, outputBinFile, 1, text->linesCount);
 
@@ -49,7 +59,8 @@ enum asmErrorCode main_assembler_function(textData* text)
         if(sscanf(text->linesPtr[i], "%s", command) != 1)
         {
             printf("error!\n");
-            // input error
+            
+            return INVALID_SYNTAX;
         }
 
         if (!strcmp(command, "push"))
@@ -63,8 +74,15 @@ enum asmErrorCode main_assembler_function(textData* text)
 
                 fprintf(outputTextFile, "17 %lf\n", commandArg);
 
-                write_char_to_buffer(&binBuffer, cmd);
-                write_double_to_buffer(&binBuffer, commandArg);
+                if ((error = write_char_to_buffer(&binBuffer, cmd)))
+                {
+                    return error;
+                }
+
+                if ((error = write_double_to_buffer(&binBuffer, commandArg)))
+                {
+                    return error;
+                }
             }
 
             else if (sscanf(text->linesPtr[i], "%s %s", command, registerName) == 2)
@@ -75,7 +93,10 @@ enum asmErrorCode main_assembler_function(textData* text)
 
                 fprintf(outputTextFile, "33 ");
 
-                write_char_to_buffer(&binBuffer, cmd);
+                if ((error = write_char_to_buffer(&binBuffer, cmd)))
+                {
+                    return error;
+                }
 
                 if (registerName[0] == 'r' && registerName[2] == 'x')
                 {
@@ -95,19 +116,25 @@ enum asmErrorCode main_assembler_function(textData* text)
                         break;
                     
                     default:
-                        // register name error
-                        break;
+                        return WRONG_REGISTER_NAME;
                     }
+                }
+                else
+                {
+                    return INVALID_SYNTAX;
                 }
 
                 fprintf(outputTextFile, "%d\n", reg);
 
-                write_char_to_buffer(&binBuffer, reg);
+                if ((error = write_char_to_buffer(&binBuffer, reg)))
+                {
+                    return error;
+                }
             }
 
             else
             {
-                // input push error
+                return INVALID_SYNTAX;
             }
         }
 
@@ -115,7 +142,7 @@ enum asmErrorCode main_assembler_function(textData* text)
         {
             if (sscanf(text->linesPtr[i], "%s %s", command, registerName) != 2)
             {
-                // input pop error
+                return INVALID_SYNTAX;
             }
 
             char cmd = 0;
@@ -128,7 +155,10 @@ enum asmErrorCode main_assembler_function(textData* text)
 
             fprintf(outputTextFile, "45 ");
 
-            write_char_to_buffer(&binBuffer, cmd);
+            if ((error = write_char_to_buffer(&binBuffer, cmd)))
+            {
+                return error;
+            }
 
             if (registerName[0] == 'r' && registerName[2] == 'x')
             {
@@ -148,14 +178,16 @@ enum asmErrorCode main_assembler_function(textData* text)
                     break;
                 
                 default:
-                    // register name error
-                    break;
+                    return WRONG_REGISTER_NAME;
                 }
             }
 
             fprintf(outputTextFile, "%d\n", reg);
 
-            write_char_to_buffer(&binBuffer, reg);
+            if ((error = write_char_to_buffer(&binBuffer, reg)))
+            {
+                return error;
+            }
         }
 
         else if (!strcmp(command, "add"))
@@ -215,12 +247,15 @@ enum asmErrorCode main_assembler_function(textData* text)
         
     }
 
-    if (write_buffer_to_file(outputBinFile, &binBuffer))
+    if ((error = write_buffer_to_file(outputBinFile, &binBuffer)))
     {
-        // write error
+        return error;
     }
 
-    buffer_dtor(&binBuffer);
+    if ((error = buffer_dtor(&binBuffer)))
+    {
+        return error;
+    }
     fclose(outputTextFile);
     fclose(outputBinFile);
 

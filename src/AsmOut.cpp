@@ -33,7 +33,7 @@ asmErrorCode buffer_dtor(outputBuffer* buffer)
     return NO_ASSEMBLER_ERRORS;
 }
 
-FILE* create_output_file(const char* filename, fileCreateMode modeCode)
+asmErrorCode create_output_file(FILE** file, const char* filename, fileCreateMode modeCode)
 {
     assert(filename);
 
@@ -49,17 +49,17 @@ FILE* create_output_file(const char* filename, fileCreateMode modeCode)
         break;
     
     default:
-        break;
+        return WRONG_FILE_CREATE_MODE;
     }
 
-    FILE* file = fopen(filename, mode);
+    *file = fopen(filename, mode);
 
     if (!file)
     {
-        // creating file error
+        return FILE_CREATING_ERROR;
     }
 
-    return file;
+    return NO_ASSEMBLER_ERRORS;
 }
 
 asmErrorCode create_command_buffer(char** buffer, size_t size)
@@ -70,7 +70,7 @@ asmErrorCode create_command_buffer(char** buffer, size_t size)
 
     if (!buffer)
     {
-        // calloc error
+        return ALLOC_MEMORY_ERROR;
     }
 
     return NO_ASSEMBLER_ERRORS;
@@ -97,18 +97,6 @@ asmErrorCode write_header_info(FILE* outputTextFile, FILE* outputBinFile, int ve
     return NO_ASSEMBLER_ERRORS;
 }
 
-asmErrorCode write_char_to_bin_file(FILE* file, char num)
-{
-    assert(file);
-
-    if (fwrite(&num, sizeof(char), 1, file) != 1)
-    {
-        // write error
-    }
-
-    return NO_ASSEMBLER_ERRORS;
-}
-
 asmErrorCode write_char_to_buffer(outputBuffer* buffer, char num)
 {
     assert(buffer);
@@ -125,7 +113,7 @@ asmErrorCode write_buffer_to_file(FILE* file, outputBuffer* buffer)
 
     if (fwrite(buffer->Buffer, sizeof(char), buffer->bufferPointer, file) != buffer->bufferPointer)
     {
-        // fwrite error
+        return FWRITE_ERROR;
     }
 
     return NO_ASSEMBLER_ERRORS;
@@ -153,7 +141,7 @@ asmErrorCode write_double_to_bin_file(FILE* file, double num)
 
     if (fwrite(&num, sizeof(double), 1, file) != 1)
     {
-        // write error
+        return FWRITE_ERROR;
     }
 
     return NO_ASSEMBLER_ERRORS;
@@ -165,7 +153,19 @@ asmErrorCode write_int_to_bin_file(FILE* file, int num)
 
     if (fwrite(&num, sizeof(int), 1, file) != 1)
     {
-        // write error
+        return FWRITE_ERROR;
+    }
+
+    return NO_ASSEMBLER_ERRORS;
+}
+
+asmErrorCode write_char_to_bin_file(FILE* file, char num)
+{
+    assert(file);
+
+    if (fwrite(&num, sizeof(char), 1, file) != 1)
+    {
+        return FWRITE_ERROR;
     }
 
     return NO_ASSEMBLER_ERRORS;
