@@ -19,6 +19,8 @@ textData* asm_prepare(const char* filename)
 
     CHECK_ERR_MAIN(get_text(filename, &text));
 
+    text_to_lower(&text);
+
     return &text;
 }
 
