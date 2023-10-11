@@ -38,6 +38,15 @@ void print_assembler_error_message(asmErrorCode error, FILE* stream)
     CHECK_CODE(error, FWRITE_ERROR,             "Can't write information in file!\n");
     CHECK_CODE(error, INVALID_SYNTAX,           "Invalid syntax!\n");
     CHECK_CODE(error, WRONG_REGISTER_NAME,      "Invalid register name!\n");
+    CHECK_CODE(error, FEW_CONSOLE_ARGS,         "Too few arguments for assembler!\n");
 
     #undef CHECK_CODE
+}
+
+void print_filename(FILE* stream ,const char* filename)
+{
+    color_fprintf(stream, COLOR_BLUE, STYLE_UNDERLINED, "File:");
+    fputc(' ', stream);
+    fputs(filename, stream);
+    fputc('\n', stream);
 }

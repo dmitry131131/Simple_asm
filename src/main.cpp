@@ -6,15 +6,25 @@
 #include "AsmRead.h"
 #include "AssemblerFunc.h"
 
-int main()
+int main(int argc, char* argv[])
 {
-    textData* text = asm_prepare("text.txt");
+    textData* text = NULL;
     asmErrorCode error = NO_ASSEMBLER_ERRORS;
 
-    if ((error = main_assembler_function(text)))
+    if (argc == 1)
     {
-        print_assembler_error_message(error, stderr);
+        print_assembler_error_message(FEW_CONSOLE_ARGS, stderr);
         return 0;
+    }
+
+    for (int i = 1; i < argc; i++)
+    {
+        text = asm_prepare(argv[i]);
+        if ((error = main_assembler_function(text)))
+        {
+            print_assembler_error_message(error, stderr);
+            return 0;
+        }
     }
 
     remove_text(text);

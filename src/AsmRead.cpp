@@ -7,6 +7,7 @@
 #include <assert.h>
 
 #include "OneginError.h"
+#include "AsmErrors.h"
 #include "InputOutput.h"
 #include "AsmRead.h"
 
@@ -17,7 +18,13 @@ textData* asm_prepare(const char* filename)
     static textData text = {};
     errorCode err = NO_ERRORS;
 
-    CHECK_ERR_MAIN(get_text(filename, &text));
+    err = get_text(filename, &text);
+
+    if (err)
+    {
+        print_filename(stderr, filename);
+        print_error_message(stderr, err);
+    }
 
     text_to_lower(&text);
 
