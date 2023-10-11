@@ -21,6 +21,8 @@ textData* asm_prepare(const char* filename)
 
     text_to_lower(&text);
 
+    remove_comments_from_text(&text);
+
     return &text;
 }
 
@@ -33,6 +35,21 @@ textData* text_to_lower(textData* text)
         if ((text->bufferName[i] >= 65) && (text->bufferName[i] < 92))
         {
             text->bufferName[i] += 32;
+        }
+    }
+
+    return text;
+}
+
+textData* remove_comments_from_text(textData* text)
+{
+    assert(text);
+
+    for (size_t i = 0; i < text->bufferSize; i++)
+    {
+        if (text->bufferName[i] == ';')
+        {
+            text->bufferName[i] = 0;
         }
     }
 
