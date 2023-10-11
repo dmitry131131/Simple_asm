@@ -15,9 +15,9 @@ TARGET = main
 SourcePrefix = src/
 BuildPrefix = build/
 BuildFolder = build
-Include = -Iinclude -IOnegin_task/include
+Include = -Iinclude -IOnegin_task/include -IOnegin_task/Color_console_output/include
 
-Sources = AsmRead.cpp AssemblerFunc.cpp AsmOut.cpp
+Sources = AsmRead.cpp AssemblerFunc.cpp AsmOut.cpp AsmErrors.cpp
 Main = main.cpp
 
 LibObjects = Onegin_task/build/Error.o Onegin_task/build/InputOutput.o Onegin_task/build/Sorts.o\

@@ -13,7 +13,7 @@ int main()
 
     if ((error = main_assembler_function(text)))
     {
-        
+        print_assembler_error_message(error, stderr);
         return 0;
     }
 

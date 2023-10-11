@@ -14,9 +14,11 @@ enum asmErrorCode {
     ALLOC_MEMORY_ERROR,
     FWRITE_ERROR,
     INVALID_SYNTAX,
-    WRONG_REGISTER_NAME,
-    
-
+    WRONG_REGISTER_NAME
 };
+
+void print_assembler_error_message(asmErrorCode error, FILE* stream);
+
+void print_assembler_error(asmErrorCode error, const char* lineText, size_t line);
 
 #endif
