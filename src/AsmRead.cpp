@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <ctype.h>
 
 #include "OneginError.h"
 #include "AsmErrors.h"
@@ -39,10 +40,7 @@ textData* text_to_lower(textData* text)
 
     for (size_t i = 0; i < text->bufferSize; i++)
     {
-        if ((text->bufferName[i] >= 65) && (text->bufferName[i] < 92))
-        {
-            text->bufferName[i] += 32;
-        }
+        text->bufferName[i] = (char) tolower(text->bufferName[i]);
     }
 
     return text;

@@ -23,23 +23,30 @@ void print_assembler_error_message(asmErrorCode error, FILE* stream)
 {
     color_fprintf(stream, COLOR_RED, STYLE_BOLD, "Assembler error: ");
 
-    #define CHECK_CODE(error, code, message) do{    \
-        if ((error) == (code))                      \
-        {                                           \
+    #define CHECK_CODE(code, message)               \
+        case code:                                  \
             fprintf(stream, message);               \
-        }                                           \
-    }while(0)
+            break;                                  \
 
-    CHECK_CODE(error, BUFFER_CTOR_ERROR,        "Can't construct buffer!\n");
-    CHECK_CODE(error, BUFFER_DTOR_ERROR,        "Can't destruct buffer!\n");
-    CHECK_CODE(error, WRONG_FILE_CREATE_MODE,   "Invalid file creting mode given!\n");
-    CHECK_CODE(error, FILE_CREATING_ERROR,      "Can't create file!\n");
-    CHECK_CODE(error, ALLOC_MEMORY_ERROR,       "Can't alloc memory for buffer!\n");
-    CHECK_CODE(error, FWRITE_ERROR,             "Can't write information in file!\n");
-    CHECK_CODE(error, INVALID_SYNTAX,           "Invalid syntax!\n");
-    CHECK_CODE(error, WRONG_REGISTER_NAME,      "Invalid register name!\n");
-    CHECK_CODE(error, FEW_CONSOLE_ARGS,         "Too few arguments for assembler!\n");
+    switch (error)
+    {
+        case NO_ASSEMBLER_ERRORS:
+            break;
+            
+        CHECK_CODE(BUFFER_CTOR_ERROR,        "Can't construct buffer!\n");
+        CHECK_CODE(BUFFER_DTOR_ERROR,        "Can't destruct buffer!\n");
+        CHECK_CODE(WRONG_FILE_CREATE_MODE,   "Invalid file creting mode given!\n");
+        CHECK_CODE(FILE_CREATING_ERROR,      "Can't create file!\n");
+        CHECK_CODE(ALLOC_MEMORY_ERROR,       "Can't alloc memory for buffer!\n");
+        CHECK_CODE(FWRITE_ERROR,             "Can't write information in file!\n");
+        CHECK_CODE(INVALID_SYNTAX,           "Invalid syntax!\n");
+        CHECK_CODE(WRONG_REGISTER_NAME,      "Invalid register name!\n");
+        CHECK_CODE(FEW_CONSOLE_ARGS,         "Too few arguments for assembler!\n");
 
+    default:
+        fprintf(stream, "Unknown error!\n");
+        break;
+    }
     #undef CHECK_CODE
 }
 
