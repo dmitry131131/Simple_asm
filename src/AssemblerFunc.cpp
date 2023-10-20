@@ -3,6 +3,7 @@
  * @brief Main asembler functions sources
 */
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 
@@ -19,12 +20,7 @@ enum asmErrorCode main_assembler_function(textData* text)
     outputBuffer binBuffer  = {};
     asmErrorCode error = NO_ASSEMBLER_ERRORS;
 
-    if (buffer_ctor(&binBuffer))
-    {
-        return BUFFER_CTOR_ERROR;
-    }
-
-    if ((error = create_command_buffer(&(binBuffer.Buffer), text->bufferSize * 4)))
+    if ((error = buffer_ctor(&binBuffer, text->bufferSize * 4)))
     {
         assert(!error);
         return error;
@@ -44,6 +40,13 @@ enum asmErrorCode main_assembler_function(textData* text)
         return error;
     }
 
+    TagBuffer tagBuffer = {};
+    if ((error = tag_buffer_ctor(&tagBuffer)))
+    {
+        return error;
+    }
+
+
     #define WRITE_SINGLE_COMMAND(num) do{                   \
                                                             \
     fprintf(outputTextFile, #num "\n");                     \
@@ -51,13 +54,14 @@ enum asmErrorCode main_assembler_function(textData* text)
                                                             \
     }while(0)
 
+
     write_header_info(outputTextFile, outputBinFile, 1, text->linesCount);
 
     for (size_t i = 0; i < text->linesCount; i++)
     {
-        char command[25] = {};
-        double commandArg = 0;
-        char registerName[10] = {};
+        char command[MAX_COMMAND_LEN]       = {};
+        double commandArg                   = 0;
+        char registerName[MAX_REGISTER_LEN] = {};
 
         if(sscanf(text->linesPtr[i], "%s", command) != 1)
         {
@@ -66,7 +70,58 @@ enum asmErrorCode main_assembler_function(textData* text)
             break;
         }
 
-        if (!strcmp(command, "push"))
+        if (command[0] == ':')
+        {
+            add_tag_to_buffer((command + 1), binBuffer.bufferPointer, &tagBuffer);
+        }
+
+        else if (!strcmp(command, "jmp"))
+        {
+            fprintf(outputTextFile, "99 ");
+
+            if ((error = write_char_to_buffer(&binBuffer, 13)))
+            {
+                break;
+            }
+
+            int tagIp = -1;
+            if (sscanf(text->linesPtr[i], "%s %d", command, &tagIp) == 2)
+            {
+                fprintf(outputTextFile, "%d\n", tagIp);
+            
+                if ((error = write_int_to_buffer(&binBuffer, tagIp)))
+                {
+                    break;
+                }
+                continue;
+            }
+
+            char tagName[MAX_COMMAND_LEN] = {};
+
+            if (sscanf(text->linesPtr[i], "%s %s", command, tagName) != 2)
+            {
+                error = INVALID_SYNTAX;
+                print_assembler_error(error, text->linesPtr[i], i+1);
+                break;
+            }
+
+            tagIp = -1;
+            if ((error = get_tag_ip(&tagBuffer, tagName, &tagIp)))
+            {
+                print_assembler_error(error, text->linesPtr[i], i+1);
+                break;
+            }
+
+            fprintf(outputTextFile, "%d\n", tagIp);
+            
+            if ((error = write_int_to_buffer(&binBuffer, tagIp)))
+            {
+                break;
+            }
+
+        }
+
+        else if (!strcmp(command, "push"))
         {
             char cmd = 0;
 
@@ -278,12 +333,7 @@ enum asmErrorCode main_assembler_function(textData* text)
 
     if (error)
     {
-        if ((error = buffer_dtor(&binBuffer)))
-        {
-            return error;
-        }
-        fclose(outputTextFile);
-        fclose(outputBinFile);
+        DESTRUCT_ALL_BUFFERS_AND_RETURN;
 
         return error;
     }
@@ -293,14 +343,75 @@ enum asmErrorCode main_assembler_function(textData* text)
         return error;
     }
 
-    if ((error = buffer_dtor(&binBuffer)))
-    {
-        return error;
-    }
-    fclose(outputTextFile);
-    fclose(outputBinFile);
+    DESTRUCT_ALL_BUFFERS_AND_RETURN;
 
     #undef WRITE_SINGLE_COMMAND
 
     return NO_ASSEMBLER_ERRORS;
+}
+
+asmErrorCode tag_buffer_ctor(TagBuffer* tag)
+{
+    assert(tag);
+
+    tag->bufferName = (Tag*) calloc(TAG_BUFFER_SIZE, sizeof(Tag));
+
+    tag->size = 0;
+
+    if (!tag->bufferName)
+    {
+        return ALLOC_MEMORY_ERROR;
+    }
+
+    return NO_ASSEMBLER_ERRORS;
+}
+
+asmErrorCode tag_buffer_dtor(TagBuffer* tag)
+{
+    assert(tag);
+
+    free(tag->bufferName);
+
+    tag->size = 0;
+
+    return NO_ASSEMBLER_ERRORS;
+}
+
+asmErrorCode add_tag_to_buffer(const char* tagName, int ip, TagBuffer* tagBuffer)
+{
+    assert(tagName);
+    assert(tagBuffer);
+
+    for (size_t i = 0; i < tagBuffer->size; i++)
+    {
+        if (!strcmp(tagName, (tagBuffer->bufferName)[i].name))
+        {
+            (tagBuffer->bufferName)[i].ip = ip;
+            return NO_ASSEMBLER_ERRORS;
+        }
+    }
+
+    (tagBuffer->bufferName)[tagBuffer->size].ip   = ip;
+    strcpy((tagBuffer->bufferName)[tagBuffer->size].name, tagName);
+
+    (tagBuffer->size)++;
+
+    return NO_ASSEMBLER_ERRORS;
+}
+
+asmErrorCode get_tag_ip(TagBuffer* tagBuffer, const char* tagName, int* ip)
+{
+    assert(tagBuffer);
+    assert(tagName);
+
+    for (size_t i = 0; i < tagBuffer->size; i++)
+    {
+        if (!strcmp(tagName, (tagBuffer->bufferName)[i].name))
+        {
+            *ip = (tagBuffer->bufferName)[i].ip;
+            return NO_ASSEMBLER_ERRORS;
+        }
+    }
+
+    return TAG_NOT_FOUND;
 }

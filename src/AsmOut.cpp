@@ -9,13 +9,18 @@
 #include "AsmErrors.h"
 #include "AsmOut.h"
 
-asmErrorCode buffer_ctor(outputBuffer* buffer)
+asmErrorCode buffer_ctor(outputBuffer* buffer, size_t size)
 {
     assert(buffer);
 
     buffer->Buffer  = NULL;
 
     buffer->bufferPointer = 0;
+
+    if (create_command_buffer(&(buffer->Buffer), size))
+    {
+        return ALLOC_MEMORY_ERROR;
+    }
 
     return NO_ASSEMBLER_ERRORS;
 }
@@ -107,6 +112,22 @@ asmErrorCode write_char_to_buffer(outputBuffer* buffer, char num)
     return NO_ASSEMBLER_ERRORS;
 }
 
+asmErrorCode write_int_to_buffer(outputBuffer* buffer, int num)
+{
+    assert(buffer);
+
+    char* intPtr = (char*) &num;
+
+    for (size_t i = 0; i < sizeof(int); i++)
+    {
+        (buffer->Buffer)[buffer->bufferPointer + i] = intPtr[i];
+    }
+
+    buffer->bufferPointer += sizeof(int);
+
+    return NO_ASSEMBLER_ERRORS;
+}
+
 asmErrorCode write_buffer_to_file(FILE* file, outputBuffer* buffer)
 {
     assert(file);
@@ -130,7 +151,7 @@ asmErrorCode write_double_to_buffer(outputBuffer* buffer, double num)
         (buffer->Buffer)[buffer->bufferPointer + i] = doublePtr[i];
     }
 
-    buffer->bufferPointer += 8;
+    buffer->bufferPointer += sizeof(double);
 
     return NO_ASSEMBLER_ERRORS;
 }

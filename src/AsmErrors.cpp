@@ -42,6 +42,7 @@ void print_assembler_error_message(asmErrorCode error, FILE* stream)
         CHECK_CODE(INVALID_SYNTAX,           "Invalid syntax!\n");
         CHECK_CODE(WRONG_REGISTER_NAME,      "Invalid register name!\n");
         CHECK_CODE(FEW_CONSOLE_ARGS,         "Too few arguments for assembler!\n");
+        CHECK_CODE(TAG_NOT_FOUND,            "Tag not found in tag buffer!\n");
 
     default:
         fprintf(stream, "Unknown error!\n");

@@ -15,7 +15,8 @@ enum asmErrorCode {
     FWRITE_ERROR,
     INVALID_SYNTAX,
     WRONG_REGISTER_NAME,
-    FEW_CONSOLE_ARGS
+    FEW_CONSOLE_ARGS,
+    TAG_NOT_FOUND
 };
 
 void print_assembler_error_message(asmErrorCode error, FILE* stream);
